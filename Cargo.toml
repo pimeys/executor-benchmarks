@@ -1,0 +1,15 @@
+[package]
+name = "executor-benchmarks"
+version = "0.1.0"
+authors = ["Stjepan Glavina <stjepang@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+crossbeam-utils = "0.6.5"
+futures = "0.1.25"
+futures-preview = { version = "0.3.0-alpha.11", package = "futures-preview" }
+futures-util-preview = { version = "0.3.0-alpha.12", features = ["compat"] }
+juliex = { git = "https://github.com/withoutboats/juliex.git" }
+mio = "0.6.16"
+tokio = "0.1.15"
+tokio-io-pool = "0.1.5"
