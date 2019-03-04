@@ -169,7 +169,7 @@ macro_rules! benchmark_preview {
             use crate::{TASKS, STEPS};
             use crossbeam_utils::sync::WaitGroup;
             use futures_preview::future::Future;
-            use futures_preview::task::{LocalWaker, Poll};
+            use futures_preview::task::{Poll, Waker};
             use std::pin::Pin;
 
             struct Task {
@@ -179,7 +179,7 @@ macro_rules! benchmark_preview {
             impl Future for Task {
                 type Output = ();
 
-                fn poll(mut self: Pin<&mut Self>, w: &LocalWaker) -> Poll<Self::Output> {
+                fn poll(mut self: Pin<&mut Self>, w: &Waker) -> Poll<Self::Output> {
                     self.depth += 1;
 
                     if self.depth == STEPS {
