@@ -1,4 +1,4 @@
-#![feature(test, async_await, await_macro, futures_api)]
+#![feature(test, async_await, await_macro)]
 #![warn(rust_2018_idioms)]
 
 extern crate test;
@@ -33,7 +33,7 @@ macro_rules! benchmark_legacy {
     (notify_self, $run:path, $spawn:path) => {
         #[bench]
         fn notify_self(b: &mut test::Bencher) {
-            use crate::{TASKS, STEPS};
+            use crate::{STEPS, TASKS};
             use crossbeam_utils::sync::WaitGroup;
             use futures::{future, task, Async};
 
@@ -95,7 +95,7 @@ macro_rules! benchmark_legacy {
     };
 
     (poll_reactor, $run:path, $spawn:path) => {
-        use crate::{TASKS, STEPS};
+        use crate::{STEPS, TASKS};
         use crossbeam_utils::sync::WaitGroup;
         use futures::{future, Async};
         use tokio::reactor::Registration;
@@ -169,7 +169,7 @@ macro_rules! benchmark_preview {
             use crate::{TASKS, STEPS};
             use crossbeam_utils::sync::WaitGroup;
             use futures_preview::future::Future;
-            use futures_preview::task::{Poll, Waker};
+            use futures_preview::task::{Poll, Context};
             use std::pin::Pin;
 
             struct Task {
@@ -179,13 +179,13 @@ macro_rules! benchmark_preview {
             impl Future for Task {
                 type Output = ();
 
-                fn poll(mut self: Pin<&mut Self>, w: &Waker) -> Poll<Self::Output> {
+                fn poll(mut self: Pin<&mut Self>, w: &mut Context<'_>) -> Poll<Self::Output> {
                     self.depth += 1;
 
                     if self.depth == STEPS {
                         Poll::Ready(())
                     } else {
-                        w.wake();
+                        w.waker().wake_by_ref();
                         Poll::Pending
                     }
                 }
@@ -288,7 +288,7 @@ macro_rules! benchmark_preview {
 }
 
 mod tokio {
-    use tokio::{spawn, run};
+    use tokio::{run, spawn};
 
     benchmark_legacy!(smoke, run, spawn);
     benchmark_legacy!(notify_self, run, spawn);
